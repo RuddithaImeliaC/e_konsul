@@ -1,11 +1,19 @@
+import 'package:e_konsul/components/my_button.dart';
+import 'package:e_konsul/components/my_textfield.dart';
 import 'package:flutter/material.dart';
 
-late Size mq;
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  MyApp({super.key});
+
+  final usernameController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  void signUserIn() {}
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -24,44 +32,39 @@ class MyApp extends StatelessWidget {
             padding: const EdgeInsets.all(8),
             child: Column(children:
                 // Image(image: 'images/logo.jpg'),),
-                const [
-              SizedBox(height: 50),
-              Icon(
-                Icons.local_hospital_rounded,
-                size: 150,
+                [
+              SizedBox(
+                height: 300,
+                width: 300,
+                child: Image(image: AssetImage("images/logo.jpg")),
               ),
-              SizedBox(height: 50),
+              SizedBox(height: 30),
               Text('E-Konsul Puskesmas Talise',
                   style: TextStyle(
-                    color: Colors.black87,
+                    color: Colors.blue,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     // fontFamily: 'Bebas',
                   )),
               SizedBox(height: 25),
-              Padding(padding: const EdgeInsets.symmetric(horizontal: 25.0)),
-              TextField(
-                decoration: InputDecoration(
-                  enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white)),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey)),
-                  fillColor: Colors.white,
-                  filled: true,
-                ),
-              ),
+              MyTextField(
+                  controller: usernameController,
+                  hintText: 'Username',
+                  obscureText: false),
               SizedBox(height: 25),
-              Padding(padding: const EdgeInsets.symmetric(horizontal: 25.0)),
-              TextField(
-                decoration: InputDecoration(
-                  enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white)),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey)),
-                  fillColor: Colors.white,
-                  filled: true,
-                ),
-              )
+              MyTextField(
+                  controller: passwordController,
+                  hintText: 'Password',
+                  obscureText: true),
+              SizedBox(height: 10),
+              Text(
+                'Belum punya akun? Daftar',
+                style: TextStyle(color: Colors.black),
+              ),
+              SizedBox(height: 10),
+              MyButton(
+                onTap: signUserIn,
+              ),
             ]),
           )),
         ));
