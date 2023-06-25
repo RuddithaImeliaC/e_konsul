@@ -7,6 +7,7 @@ import 'package:e_konsul/components/my_textfield.dart';
 import 'package:e_konsul/otpscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'package:firebase_database/firebase_database.dart';
 
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         routes: <String, WidgetBuilder>{
-          '/otp': (BuildContext context) => const OtpScreen(),
+          '/otp': (BuildContext context) => OtpScreen(),
           '/chatscreen': (BuildContext context) => ChatScreen()
         },
         home: LoginScreen(),
@@ -82,6 +83,8 @@ class _LoginScreen extends State<LoginScreen> {
         await users.update({
           "otpcode": otpcode,
         });
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('users', username);
         usernameErrorText = '';
         passwordErrorText = '';
         Navigator.of(context).pushNamed('/otp');

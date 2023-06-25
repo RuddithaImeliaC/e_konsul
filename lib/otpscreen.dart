@@ -1,18 +1,36 @@
 import 'package:e_konsul/components/my_button.dart';
 import 'package:e_konsul/components/otp_textfield.dart';
+import 'package:e_konsul/models/user.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(OtpScreen());
 }
 
 class OtpScreen extends StatelessWidget {
-  const OtpScreen({super.key});
+  OtpScreen({super.key});
 
- signUserIn(context) {
-   // DatabaseReference users = FirebaseDatabase.instance.ref('users/$username');
-   Navigator.of(context).pushNamed('/chatscreen');
+  String otp = '';
+
+  callback(data) {
+    otp = data;
+  }
+
+ signUserIn(context) async {
+   final SharedPreferences prefs = await SharedPreferences.getInstance();
+   var username = await prefs.getString('users');
+   DatabaseReference users = FirebaseDatabase.instance.ref('users/$username');
+   DataSnapshot snap = await users.get();
+   if(snap.value != null) {
+     User user = User.fromSnapshot(snap.value as Map<dynamic, dynamic>);
+     var value = snap.value as Map<dynamic, dynamic>;
+     user.otpcode = value['otpcode'];
+     print(user.otpcode.toString());
+     if(user.otpcode.toString() == otp) Navigator.of(context).pushNamed('/chatscreen');
+   };
   }
 
   @override
@@ -35,7 +53,9 @@ class OtpScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 50),
-                  OtpField(),
+                  OtpField(
+                    callback: callback,
+                  ),
                   SizedBox(height: 75),
                   MyButton(onTap: () {
                 signUserIn(context);

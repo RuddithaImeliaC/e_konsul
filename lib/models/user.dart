@@ -1,8 +1,8 @@
-import 'package:firebase_database/firebase_database.dart';
 
 class User {
   String username;
   String password;
+  late int otpcode;
 
   User({required this.username, required this.password});
 

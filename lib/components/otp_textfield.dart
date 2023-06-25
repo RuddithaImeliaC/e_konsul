@@ -2,6 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class OtpField extends StatelessWidget {
+
+  var otpController1 = TextEditingController();
+  var otpController2 = TextEditingController();
+  var otpController3 = TextEditingController();
+  var otpController4 = TextEditingController();
+  var otp;
+
+  Function(String) callback;
+
+  OtpField({super.key, required this.callback});
+
+  sendOtpToParent() {
+    otp = otpController1.text + otpController2.text + otpController3.text +
+        otpController4.text;
+    callback(otp);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -30,6 +47,10 @@ class OtpField extends StatelessWidget {
             LengthLimitingTextInputFormatter(1),
             // FilteringTextInputFormatter.digitsOnly,
           ],
+          controller: otpController1,
+          onChanged: (value) {
+            sendOtpToParent();
+          },
         ),
       ),
       SizedBox(
@@ -48,6 +69,10 @@ class OtpField extends StatelessWidget {
             LengthLimitingTextInputFormatter(1),
             // FilteringTextInputFormatter.digitsOnly,
           ],
+          controller: otpController2,
+          onChanged: (value) {
+            sendOtpToParent();
+          },
         ),
       ),
       SizedBox(
@@ -66,6 +91,10 @@ class OtpField extends StatelessWidget {
             LengthLimitingTextInputFormatter(1),
             // FilteringTextInputFormatter.digitsOnly,
           ],
+          controller: otpController3,
+          onChanged: (value) {
+            sendOtpToParent();
+          },
         ),
       ),
       SizedBox(
@@ -84,6 +113,10 @@ class OtpField extends StatelessWidget {
             LengthLimitingTextInputFormatter(1),
             // FilteringTextInputFormatter.digitsOnly,
           ],
+          controller: otpController4,
+          onChanged: (value) {
+            sendOtpToParent();
+          },
         ),
       ),
       // SizedBox(height: 70),
