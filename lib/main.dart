@@ -1,4 +1,7 @@
 
+import 'dart:math';
+
+import 'package:e_konsul/chatscreen.dart';
 import 'package:e_konsul/components/my_button.dart';
 import 'package:e_konsul/components/my_textfield.dart';
 import 'package:e_konsul/otpscreen.dart';
@@ -29,7 +32,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         routes: <String, WidgetBuilder>{
-          '/otp': (BuildContext context) => const OtpScreen()
+          '/otp': (BuildContext context) => const OtpScreen(),
+          '/chatscreen': (BuildContext context) => ChatScreen()
         },
         home: LoginScreen(),
     );
@@ -66,16 +70,24 @@ class _LoginScreen extends State<LoginScreen> {
     }
     var success = await login(username, password);
     print(success);
-    setState(() {
+    setState(() async {
+
       if (!success) {
         usernameErrorText = 'wrong username or password';
         passwordErrorText = 'wrong username or password';
       } else {
+        var rng = new Random();
+        var otpcode = rng.nextInt(9000) + 1000;
+        DatabaseReference users = FirebaseDatabase.instance.ref('users/$username');
+        await users.update({
+          "otpcode": otpcode,
+        });
         usernameErrorText = '';
         passwordErrorText = '';
+        Navigator.of(context).pushNamed('/otp');
       }
     });
-    Navigator.of(context).pushNamed('/otp');
+
   }
 
     Future<bool> login(String username, String password) async {

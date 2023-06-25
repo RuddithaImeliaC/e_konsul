@@ -10,7 +10,10 @@ void main() {
 class OtpScreen extends StatelessWidget {
   const OtpScreen({super.key});
 
-  void signUserIn() {}
+ signUserIn(context) {
+   // DatabaseReference users = FirebaseDatabase.instance.ref('users/$username');
+   Navigator.of(context).pushNamed('/chatscreen');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +37,10 @@ class OtpScreen extends StatelessWidget {
                   SizedBox(height: 50),
                   OtpField(),
                   SizedBox(height: 75),
-                  MyButton(onTap: signUserIn)
-                ],
+                  MyButton(onTap: () {
+                signUserIn(context);
+                },
+                  )],
               ),
             ))));
   }
