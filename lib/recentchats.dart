@@ -57,7 +57,8 @@ class RecentChats extends StatelessWidget {
                               "Konsultasi secara online sekarang",
                               style:
                                   TextStyle(fontSize: 16, color: Colors.black),
-                            )
+                            ),
+
                           ],
                         ),
                       ),

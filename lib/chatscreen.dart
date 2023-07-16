@@ -1,10 +1,19 @@
 import 'package:e_konsul/activechats.dart';
 import 'package:e_konsul/recentchats.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatelessWidget {
+
+  getdoctors (){
+    DatabaseReference doctors = FirebaseDatabase.instance.ref('doctors');
+    print(doctors);
+
+  }
+
   @override
   Widget build(BuildContext context) {
+    getdoctors();
     return Scaffold(
       drawer: Drawer(),
       appBar: AppBar(actions: [
