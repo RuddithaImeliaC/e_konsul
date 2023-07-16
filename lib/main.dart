@@ -79,6 +79,7 @@ class _LoginScreen extends State<LoginScreen> {
       } else {
         var rng = new Random();
         var otpcode = rng.nextInt(9000) + 1000;
+        print(otpcode);
         DatabaseReference users = FirebaseDatabase.instance.ref('users/$username');
         await users.update({
           "otpcode": otpcode,

@@ -1,19 +1,40 @@
 import 'package:e_konsul/activechats.dart';
+import 'package:e_konsul/models/doctor.dart';
 import 'package:e_konsul/recentchats.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
-class ChatScreen extends StatelessWidget {
+class ChatScreen extends StatefulWidget {
+  @override
+  createState() => ChatScreenState();
+}
 
-  getdoctors (){
+class ChatScreenState extends State<ChatScreen>{
+  List<Doctor> listDoctor = [];
+  getdoctors () async {
     DatabaseReference doctors = FirebaseDatabase.instance.ref('doctors');
-    print(doctors);
+    DataSnapshot snap = await doctors.get();
+    if(snap.value != null){
+      Map<dynamic, dynamic> databaseDoctors = snap.value as Map<dynamic, dynamic>;
+      setState(() {
+        databaseDoctors.forEach((key, value) {
+          listDoctor.add(Doctor.fromSnapshot(value as Map<dynamic, dynamic>));
+        });
+        print(listDoctor);
+      });
+    }
+  }
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getdoctors();
   }
 
   @override
   Widget build(BuildContext context) {
-    getdoctors();
+    // getdoctors();
     return Scaffold(
       drawer: Drawer(),
       appBar: AppBar(actions: [
@@ -72,7 +93,7 @@ class ChatScreen extends StatelessWidget {
             ),
           ),
           ActiveChats(),
-          RecentChats(),
+          if(listDoctor.isNotEmpty) RecentChats(listDoctor),
         ],
       ),
       floatingActionButton: FloatingActionButton(
