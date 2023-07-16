@@ -20,7 +20,6 @@ class ChatScreenState extends State<ChatScreen>{
         databaseDoctors.forEach((key, value) {
           listDoctor.add(Doctor.fromSnapshot(value as Map<dynamic, dynamic>));
         });
-        print(listDoctor);
       });
     }
   }
@@ -28,13 +27,12 @@ class ChatScreenState extends State<ChatScreen>{
   @override
   void initState() {
     // TODO: implement initState
-    super.initState();
     getdoctors();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    // getdoctors();
     return Scaffold(
       drawer: Drawer(),
       appBar: AppBar(actions: [

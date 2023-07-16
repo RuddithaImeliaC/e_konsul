@@ -13,30 +13,40 @@ import 'package:firebase_database/firebase_database.dart';
 
 import 'models/user.dart';
 
-void main() {
+String? prefUser;
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await InitFirebase();
+  prefUser = await isLoggedIn();
   runApp(const MyApp());
+}
+
+InitFirebase() async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  FirebaseDatabase.instance.databaseURL = "https://e-konsul-2023-default-rtdb.asia-southeast1.firebasedatabase.app";
+}
+
+isLoggedIn() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  var users = await prefs.getString('users');
+  return users;
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  Future initFirebase() async {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    FirebaseDatabase.instance.databaseURL = "https://e-konsul-2023-default-rtdb.asia-southeast1.firebasedatabase.app";
-  }
-
   @override
   Widget build(BuildContext context) {
-    initFirebase();
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         routes: <String, WidgetBuilder>{
           '/otp': (BuildContext context) => OtpScreen(),
           '/chatscreen': (BuildContext context) => ChatScreen()
         },
-        home: LoginScreen(),
+        home: (prefUser != null) ? ChatScreen() : LoginScreen(),
     );
   }
 }
