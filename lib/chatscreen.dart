@@ -1,4 +1,3 @@
-import 'package:e_konsul/activechats.dart';
 import 'package:e_konsul/models/doctor.dart';
 import 'package:e_konsul/recentchats.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -11,14 +10,19 @@ class ChatScreen extends StatefulWidget {
 
 class ChatScreenState extends State<ChatScreen>{
   List<Doctor> listDoctor = [];
-  getdoctors () async {
+  TextEditingController SearchController = new TextEditingController();
+  getdoctors (String search) async {
     DatabaseReference doctors = FirebaseDatabase.instance.ref('doctors');
     DataSnapshot snap = await doctors.get();
     if(snap.value != null){
       Map<dynamic, dynamic> databaseDoctors = snap.value as Map<dynamic, dynamic>;
       setState(() {
+        listDoctor.clear();
         databaseDoctors.forEach((key, value) {
-          listDoctor.add(Doctor.fromSnapshot(value as Map<dynamic, dynamic>));
+          var doctor = Doctor.fromSnapshot(value as Map<dynamic, dynamic>);
+          if(doctor.name.contains(search)) {
+            listDoctor.add(doctor);
+          }
         });
       });
     }
@@ -27,7 +31,7 @@ class ChatScreenState extends State<ChatScreen>{
   @override
   void initState() {
     // TODO: implement initState
-    getdoctors();
+    getdoctors("");
     super.initState();
   }
 
@@ -79,6 +83,10 @@ class ChatScreenState extends State<ChatScreen>{
                       child: TextFormField(
                         decoration: InputDecoration(
                             hintText: "Search", border: InputBorder.none),
+                        controller: SearchController,
+                        onEditingComplete: () {
+                          getdoctors(SearchController.text);
+                        },
                       ),
                     ),
                   ),
@@ -90,7 +98,7 @@ class ChatScreenState extends State<ChatScreen>{
               ),
             ),
           ),
-          ActiveChats(),
+          // ActiveChats(),
           if(listDoctor.isNotEmpty) RecentChats(listDoctor),
         ],
       ),
