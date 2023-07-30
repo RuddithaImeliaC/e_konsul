@@ -19,7 +19,9 @@ class ChatScreenState extends State<ChatScreen>{
       setState(() {
         listDoctor.clear();
         databaseDoctors.forEach((key, value) {
-          var doctor = Doctor.fromSnapshot(value as Map<dynamic, dynamic>);
+          var data = value as Map<dynamic, dynamic>;
+          data["doctorKey"] = key;
+          var doctor = Doctor.fromSnapshot(data);
           if(doctor.name.contains(search)) {
             listDoctor.add(doctor);
           }

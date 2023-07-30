@@ -1,8 +1,48 @@
 import 'package:e_konsul/chatbottomsheet.dart';
 import 'package:e_konsul/chatsample.dart';
+import 'package:e_konsul/models/doctor.dart';
+import 'package:e_konsul/models/message.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ChatPage extends StatelessWidget {
+class ChatPage extends StatefulWidget {
+  final Doctor doctor;
+  ChatPage({Key? key, required this.doctor}) : super(key: key);
+
+  @override
+  createState() => ChatPageState();
+}
+
+class ChatPageState extends State<ChatPage> {
+  List<Message> listMessage = [];
+
+  getMessages() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var user = await prefs.getString('users');
+    var key = widget.doctor.doctorKey;
+    DatabaseReference m = FirebaseDatabase.instance.ref('chats/${user}_${key}');
+    DataSnapshot snap = await m.get();
+    if (snap.value != null) {
+      Map<dynamic, dynamic> database = snap.value as Map<dynamic, dynamic>;
+      setState(() {
+        listMessage.clear();
+        var list = database["messages"];
+        list.forEach((valueMessage) {
+          var data = valueMessage as Map<dynamic, dynamic>;
+          var message = Message.fromSnapshot(data);
+          listMessage.add(message);
+        });
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    getMessages();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +65,7 @@ class ChatPage extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.only(left: 5),
                     child: Text(
-                      "Dr. Nurlaela ",
+                      "Dr. ${widget.doctor.name}",
                       style: TextStyle(color: Color(0xFF113953)),
                     ),
                   )
@@ -59,7 +99,7 @@ class ChatPage extends StatelessWidget {
         ),
         body: ListView(
           padding: EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 80),
-          children: [ChatSample()],
+          children: [ChatSample(listMessage)],
         ),
         bottomSheet: ChatBottomSheet());
   }

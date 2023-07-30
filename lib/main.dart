@@ -1,9 +1,11 @@
 
 import 'dart:math';
 
+import 'package:e_konsul/chatpage.dart';
 import 'package:e_konsul/chatscreen.dart';
 import 'package:e_konsul/components/my_button.dart';
 import 'package:e_konsul/components/my_textfield.dart';
+import 'package:e_konsul/models/doctor.dart';
 import 'package:e_konsul/otpscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -44,7 +46,15 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         routes: <String, WidgetBuilder>{
           '/otp': (BuildContext context) => OtpScreen(),
-          '/chatscreen': (BuildContext context) => ChatScreen()
+          '/chatscreen': (BuildContext context) => ChatScreen(),
+          // '/chatPage': (BuildContext context) => ChatPage()
+        },
+        onGenerateRoute: (RouteSettings settings) {
+          var routes = <String, WidgetBuilder>{
+            "/chatPage": (ctx) => ChatPage(doctor: settings.arguments as Doctor),
+          };
+          WidgetBuilder? builder = routes[settings.name];
+          return MaterialPageRoute(builder: (ctx) => builder!(ctx));
         },
         home: (prefUser != null) ? ChatScreen() : LoginScreen(),
     );
