@@ -1,4 +1,3 @@
-
 import 'dart:math';
 
 import 'package:e_konsul/chatpage.dart';
@@ -28,7 +27,8 @@ InitFirebase() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  FirebaseDatabase.instance.databaseURL = "https://e-konsul-2023-default-rtdb.asia-southeast1.firebasedatabase.app";
+  FirebaseDatabase.instance.databaseURL =
+      "https://e-konsul-2023-default-rtdb.asia-southeast1.firebasedatabase.app";
 }
 
 isLoggedIn() async {
@@ -43,20 +43,20 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        routes: <String, WidgetBuilder>{
-          '/otp': (BuildContext context) => OtpScreen(),
-          '/chatscreen': (BuildContext context) => ChatScreen(),
-          // '/chatPage': (BuildContext context) => ChatPage()
-        },
-        onGenerateRoute: (RouteSettings settings) {
-          var routes = <String, WidgetBuilder>{
-            "/chatPage": (ctx) => ChatPage(doctor: settings.arguments as Doctor),
-          };
-          WidgetBuilder? builder = routes[settings.name];
-          return MaterialPageRoute(builder: (ctx) => builder!(ctx));
-        },
-        home: (prefUser != null) ? ChatScreen() : LoginScreen(),
+      debugShowCheckedModeBanner: false,
+      routes: <String, WidgetBuilder>{
+        '/otp': (BuildContext context) => OtpScreen(),
+        '/chatscreen': (BuildContext context) => ChatScreen(),
+        // '/chatPage': (BuildContext context) => ChatPage()
+      },
+      onGenerateRoute: (RouteSettings settings) {
+        var routes = <String, WidgetBuilder>{
+          "/chatPage": (ctx) => ChatPage(doctor: settings.arguments as Doctor),
+        };
+        WidgetBuilder? builder = routes[settings.name];
+        return MaterialPageRoute(builder: (ctx) => builder!(ctx));
+      },
+      home: (prefUser != null) ? ChatScreen() : LoginScreen(),
     );
   }
 }
@@ -91,39 +91,40 @@ class _LoginScreen extends State<LoginScreen> {
     }
     var success = await login(username, password);
     print(success);
-    setState(() async {
-
-      if (!success) {
+    if (!success) {
+      setState(() {
         usernameErrorText = 'wrong username or password';
         passwordErrorText = 'wrong username or password';
-      } else {
-        var rng = new Random();
-        var otpcode = rng.nextInt(9000) + 1000;
-        print(otpcode);
-        DatabaseReference users = FirebaseDatabase.instance.ref('users/$username');
-        await users.update({
-          "otpcode": otpcode,
-        });
-        final SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('users', username);
+      });
+    } else {
+      var rng = new Random();
+      var otpcode = rng.nextInt(9000) + 1000;
+      print(otpcode);
+      DatabaseReference users =
+          FirebaseDatabase.instance.ref('users/$username');
+      await users.update({
+        "otpcode": otpcode,
+      });
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('users', username);
+      setState(() {
         usernameErrorText = '';
         passwordErrorText = '';
-        Navigator.of(context).pushNamed('/otp');
-      }
-    });
-
+      });
+      Navigator.of(context).pushNamed('/otp');
+    }
   }
 
-    Future<bool> login(String username, String password) async {
-      DatabaseReference users = FirebaseDatabase.instance.ref('users/$username');
-      DataSnapshot snap = await users.get();
-      print(snap.value);
-      if(snap.value != null) {
-        User user = User.fromSnapshot(snap.value as Map<dynamic, dynamic>);
-        if(user.password == password) return true;
-      }
-      return false;
+  Future<bool> login(String username, String password) async {
+    DatabaseReference users = FirebaseDatabase.instance.ref('users/$username');
+    DataSnapshot snap = await users.get();
+    print(snap.value);
+    if (snap.value != null) {
+      User user = User.fromSnapshot(snap.value as Map<dynamic, dynamic>);
+      if (user.password == password) return true;
     }
+    return false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,48 +132,46 @@ class _LoginScreen extends State<LoginScreen> {
       backgroundColor: Colors.white,
       body: Center(
           child: Container(
-            padding: const EdgeInsets.all(8),
-            child: Column(children:
-            [
-              SizedBox(
-                height: 300,
-                width: 300,
-                child: Image(image: AssetImage("images/logo.jpg")),
-              ),
-              SizedBox(height: 30),
-              Text('E-Konsul Puskesmas Talise',
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    // fontFamily: 'Bebas',
-                  )),
-              SizedBox(height: 25),
-              MyTextField(
-                  controller: usernameController,
-                  hintText: 'Username',
-                  errorText: usernameErrorText,
-                  obscureText: false),
-              SizedBox(height: 25),
-              MyTextField(
-                  controller: passwordController,
-                  hintText: 'Password',
-                  errorText: passwordErrorText,
-                  obscureText: true),
-              SizedBox(height: 10),
-              Text(
-                'Belum punya akun? Daftar',
-                style: TextStyle(color: Colors.black),
-              ),
-              SizedBox(height: 10),
-              MyButton(
-                onTap: () {
-                  signUserIn(context);
-                },
-              ),
-            ]),
-          )),
+        padding: const EdgeInsets.all(8),
+        child: Column(children: [
+          SizedBox(
+            height: 300,
+            width: 300,
+            child: Image(image: AssetImage("images/logo.jpg")),
+          ),
+          SizedBox(height: 30),
+          Text('E-Konsul Puskesmas Talise',
+              style: TextStyle(
+                color: Colors.blue,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                // fontFamily: 'Bebas',
+              )),
+          SizedBox(height: 25),
+          MyTextField(
+              controller: usernameController,
+              hintText: 'Username',
+              errorText: usernameErrorText,
+              obscureText: false),
+          SizedBox(height: 25),
+          MyTextField(
+              controller: passwordController,
+              hintText: 'Password',
+              errorText: passwordErrorText,
+              obscureText: true),
+          SizedBox(height: 10),
+          Text(
+            'Belum punya akun? Daftar',
+            style: TextStyle(color: Colors.black),
+          ),
+          SizedBox(height: 10),
+          MyButton(
+            onTap: () {
+              signUserIn(context);
+            },
+          ),
+        ]),
+      )),
     );
   }
-
 }

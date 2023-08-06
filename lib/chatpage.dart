@@ -23,11 +23,24 @@ class ChatPageState extends State<ChatPage> {
     var key = widget.doctor.doctorKey;
     DatabaseReference m = FirebaseDatabase.instance.ref('chats/${user}_${key}');
     DataSnapshot snap = await m.get();
-    if (snap.value != null) {
-      Map<dynamic, dynamic> database = snap.value as Map<dynamic, dynamic>;
+
+    // listener
+    m.onValue.listen((event) {
       setState(() {
         listMessage.clear();
-        var list = database["messages"];
+        var list = event.snapshot.value as List<Object?>;
+        list.forEach((valueMessage) {
+          var data = valueMessage as Map<dynamic, dynamic>;
+          var message = Message.fromSnapshot(data);
+          listMessage.add(message);
+        });
+      });
+    });
+
+    if (snap.value != null) {
+      setState(() {
+        listMessage.clear();
+        var list = snap.value as List<Object?>;
         list.forEach((valueMessage) {
           var data = valueMessage as Map<dynamic, dynamic>;
           var message = Message.fromSnapshot(data);
@@ -99,8 +112,9 @@ class ChatPageState extends State<ChatPage> {
         ),
         body: ListView(
           padding: EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 80),
+          reverse: true,
           children: [ChatSample(listMessage)],
         ),
-        bottomSheet: ChatBottomSheet());
+        bottomSheet: ChatBottomSheet(doctorKey: widget.doctor.doctorKey));
   }
 }
