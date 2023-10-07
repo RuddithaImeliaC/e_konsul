@@ -50,6 +50,7 @@ class MyApp extends StatelessWidget {
         '/otp': (BuildContext context) => OtpScreen(),
         '/chatscreen': (BuildContext context) => ChatScreen(),
         '/registerscreen': (BuildContext context) => RegisterScreen(),
+        '/loginscreen': (BuildContext context) => LoginScreen(),
         // '/chatPage': (BuildContext context) => ChatPage()
       },
       onGenerateRoute: (RouteSettings settings) {

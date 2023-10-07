@@ -1,4 +1,6 @@
 
+import 'package:intl/intl.dart';
+
 class Message {
   Message({
     required this.isDoctor,
@@ -7,16 +9,23 @@ class Message {
 
   late final bool isDoctor;
   late final String value;
+  String? createdAt;
 
   Message.fromSnapshot(Map<dynamic, dynamic> json) {
     isDoctor = json['isDoctor'];
     value = json['value'].toString();
+    if(json['createdAt'] != null) {
+      createdAt = DateFormat("dd-MM-yyyy HH:mm:ss").format(DateTime.parse(json['createdAt'].toString()));
+    } else {
+      createdAt = "";
+    }
   }
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     data['isDoctor'] = isDoctor;
     data['value'] = value;
+    data['createdAt'] = createdAt;
     return data;
   }
 }

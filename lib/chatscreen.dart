@@ -2,6 +2,7 @@ import 'package:e_konsul/models/doctor.dart';
 import 'package:e_konsul/recentchats.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatScreen extends StatefulWidget {
   @override
@@ -28,6 +29,12 @@ class ChatScreenState extends State<ChatScreen>{
         });
       });
     }
+  }
+
+  logout() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.clear();
+    Navigator.popAndPushNamed(context, "/loginscreen");
   }
 
   @override
@@ -108,7 +115,7 @@ class ChatScreenState extends State<ChatScreen>{
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, "/LoginScreen");
+          logout();
         },
         backgroundColor: Color(0xFF113953),
         child: Icon(Icons.logout_rounded),

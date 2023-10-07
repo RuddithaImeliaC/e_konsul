@@ -19,10 +19,22 @@ class ChatSample extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Color(0xFFE1E1E2),
                 ),
-                child: Text(
-                  "${message.value}",
-                  style: TextStyle(fontSize: 16),
-                ),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                          margin: EdgeInsetsDirectional.only(bottom: 4),
+                          child: Text(
+                            "${message.value}",
+                            style: TextStyle(fontSize: 17),
+                          )
+                      ),
+                      Text(
+                        "${message.createdAt}",
+                        style: TextStyle(fontSize: 12, color: Colors.black45),
+                      ),
+                    ],
+                )
               ),
             ),
           ));
@@ -39,10 +51,21 @@ class ChatSample extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Color(0xFF113953),
                   ),
-                  child: Text(
-                    "${message.value}",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                            margin: EdgeInsetsDirectional.only(bottom: 4),
+                            child: Text(
+                              "${message.value}",
+                              style: TextStyle(fontSize: 17, color: Colors.white),
+                            )
+                        ),
+                        Text(
+                          "${message.createdAt}",
+                          style: TextStyle(fontSize: 12, color: Colors.white54),
+                        ),
+                      ])
                 ),
               ),
             ),

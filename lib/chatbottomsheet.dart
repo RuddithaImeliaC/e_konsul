@@ -13,18 +13,20 @@ class ChatBottomSheet extends StatelessWidget {
     var key = doctorKey;
     DatabaseReference m = FirebaseDatabase.instance.ref('chats/${user}_${key}');
     DataSnapshot snap = await m.get();
+
+    var objectMsg = {'isDoctor': false, 'value': msg, 'createdAt': DateTime.now().toString()};
     if (snap.value == null || snap.value == '') {
       DatabaseReference c = FirebaseDatabase.instance.ref('chats');
       DataSnapshot snapChat = await c.get();
       var dataChat = snapChat.value as Map<dynamic,dynamic>;
       dataChat['${user}_${key}']= [
-          {'isDoctor': false, 'value': msg}
+        objectMsg
       ];
       c.set(dataChat);
     } else if (snap.value != null) {
       var list = snap.value as List<Object?>;
       list = list.toList();
-      list.add({'isDoctor': false, 'value': msg});
+      list.add(objectMsg);
       m.set(list);
     }
     typeMessage.clear();
