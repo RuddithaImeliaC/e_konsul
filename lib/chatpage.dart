@@ -85,27 +85,27 @@ class ChatPageState extends State<ChatPage> {
                 ],
               ),
               actions: [
-                Padding(
-                  padding: EdgeInsets.only(right: 25),
-                  child: Icon(
-                    Icons.call,
-                    color: Color(0xFF113953),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(right: 25),
-                  child: Icon(
-                    Icons.video_call,
-                    color: Color(0xFF113953),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(right: 25),
-                  child: Icon(
-                    Icons.more_vert,
-                    color: Color(0xFF113953),
-                  ),
-                )
+                // Padding(
+                //   padding: EdgeInsets.only(right: 25),
+                //   child: Icon(
+                //     Icons.call,
+                //     color: Color(0xFF113953),
+                //   ),
+                // ),
+                // Padding(
+                //   padding: EdgeInsets.only(right: 25),
+                //   child: Icon(
+                //     Icons.video_call,
+                //     color: Color(0xFF113953),
+                //   ),
+                // ),
+                // Padding(
+                //   padding: EdgeInsets.only(right: 25),
+                //   child: Icon(
+                //     Icons.more_vert,
+                //     color: Color(0xFF113953),
+                //   ),
+                // )
               ],
             ),
           ),

@@ -6,6 +6,7 @@ import 'package:e_konsul/components/my_button.dart';
 import 'package:e_konsul/components/my_textfield.dart';
 import 'package:e_konsul/models/doctor.dart';
 import 'package:e_konsul/otpscreen.dart';
+import 'package:e_konsul/registerscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -45,8 +46,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       routes: <String, WidgetBuilder>{
+
         '/otp': (BuildContext context) => OtpScreen(),
         '/chatscreen': (BuildContext context) => ChatScreen(),
+        '/registerscreen': (BuildContext context) => RegisterScreen(),
         // '/chatPage': (BuildContext context) => ChatPage()
       },
       onGenerateRoute: (RouteSettings settings) {
@@ -132,6 +135,8 @@ class _LoginScreen extends State<LoginScreen> {
       backgroundColor: Colors.white,
       body: Center(
           child: Container(
+        child :SingleChildScrollView(
+
         padding: const EdgeInsets.all(8),
         child: Column(children: [
           SizedBox(
@@ -139,11 +144,11 @@ class _LoginScreen extends State<LoginScreen> {
             width: 300,
             child: Image(image: AssetImage("images/logo.jpg")),
           ),
-          SizedBox(height: 30),
+          SizedBox(height: 10),
           Text('E-Konsul Puskesmas Talise',
               style: TextStyle(
-                color: Colors.blue,
-                fontSize: 20,
+                color: Color(0xFF113953),
+                fontSize: 28,
                 fontWeight: FontWeight.bold,
                 // fontFamily: 'Bebas',
               )),
@@ -160,10 +165,17 @@ class _LoginScreen extends State<LoginScreen> {
               errorText: passwordErrorText,
               obscureText: true),
           SizedBox(height: 10),
-          Text(
-            'Belum punya akun? Daftar',
-            style: TextStyle(color: Colors.black),
-          ),
+              new GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, "/registerscreen");
+                },
+                child: new Text(
+                  'Belum punya akun? Daftar',
+                  style: TextStyle(color: Color(0xFF113953),
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
           SizedBox(height: 10),
           MyButton(
             onTap: () {
@@ -172,6 +184,6 @@ class _LoginScreen extends State<LoginScreen> {
           ),
         ]),
       )),
-    );
+    ));
   }
 }

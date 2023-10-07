@@ -107,10 +107,13 @@ class ChatScreenState extends State<ChatScreen>{
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushNamed(context, "/LoginScreen");
+        },
         backgroundColor: Color(0xFF113953),
-        child: Icon(Icons.message),
+        child: Icon(Icons.logout_rounded),
       ),
     );
   }
 }
+
