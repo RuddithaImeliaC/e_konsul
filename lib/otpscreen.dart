@@ -16,27 +16,39 @@ class OtpScreen extends StatefulWidget {
 class OtpScreenState extends State<OtpScreen> {
   String otp = '';
   String serverOtp = '';
+  late SharedPreferences prefs;
+  late DatabaseReference users;
 
   callback(data) {
     otp = data;
   }
 
   getOtpCode() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs = await SharedPreferences.getInstance();
     var username = await prefs.getString('users');
-    DatabaseReference users = FirebaseDatabase.instance.ref('users/$username');
+    var isUserDoctor = prefs.getBool('isUserDoctor');
+    if(isUserDoctor == true) {
+      users = FirebaseDatabase.instance.ref('doctors/$username');
+    } else {
+      users = FirebaseDatabase.instance.ref('users/$username');
+    }
     DataSnapshot snap = await users.get();
     if(snap.value != null) {
       User user = User.fromSnapshot(snap.value as Map<dynamic, dynamic>);
       var value = snap.value as Map<dynamic, dynamic>;
       user.otpcode = value['otpcode'];
-      serverOtp = user.otpcode.toString();
-      print(user.otpcode.toString());
+      setState(() {
+        serverOtp = user.otpcode.toString();
+        print(user.otpcode.toString());
+      });
     }
   }
 
  signUserIn(context) async {
-     if(serverOtp == otp || otp == '1111') Navigator.of(context).pushNamed('/chatscreen');
+     if(serverOtp == otp || otp == '1111') {
+       prefs.setBool('isLoggedIn', true);
+       Navigator.of(context).pushNamed('/chatscreen');
+     }
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'package:e_konsul/models/doctor.dart';
+import 'package:e_konsul/models/user.dart';
 import 'package:e_konsul/recentchats.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -9,21 +10,47 @@ class ChatScreen extends StatefulWidget {
   createState() => ChatScreenState();
 }
 
-class ChatScreenState extends State<ChatScreen>{
+class ChatScreenState extends State<ChatScreen> {
   List<Doctor> listDoctor = [];
+  List<User> listUser = [];
+  late SharedPreferences prefs;
+  late DatabaseReference doctors;
+  late DatabaseReference users;
+  late String? username;
+  late bool? isUserDoctor;
   TextEditingController SearchController = new TextEditingController();
-  getdoctors (String search) async {
-    DatabaseReference doctors = FirebaseDatabase.instance.ref('doctors');
-    DataSnapshot snap = await doctors.get();
-    if(snap.value != null){
-      Map<dynamic, dynamic> databaseDoctors = snap.value as Map<dynamic, dynamic>;
+
+  getdoctors(String search) async {
+    prefs = await SharedPreferences.getInstance();
+    username = prefs.getString('users');
+    users = FirebaseDatabase.instance.ref('users');
+    isUserDoctor = prefs.getBool('isUserDoctor');
+    DataSnapshot snap = await users.get();
+    if (snap.value != null) {
+      var databaseUser = snap.value as Map<dynamic, dynamic>;
+      setState(() {
+        listUser.clear();
+        databaseUser.forEach((key, value) {
+          var user = User.fromSnapshot(value);
+          if (user.username.contains(search)) {
+            listUser.add(user);
+          }
+        });
+      });
+    }
+
+    doctors = FirebaseDatabase.instance.ref('doctors');
+    snap = await doctors.get();
+    if (snap.value != null) {
+      Map<dynamic, dynamic> databaseDoctors =
+          snap.value as Map<dynamic, dynamic>;
       setState(() {
         listDoctor.clear();
         databaseDoctors.forEach((key, value) {
           var data = value as Map<dynamic, dynamic>;
           data["doctorKey"] = key;
           var doctor = Doctor.fromSnapshot(data);
-          if(doctor.name.contains(search)) {
+          if (doctor.name.contains(search)) {
             listDoctor.add(doctor);
           }
         });
@@ -49,12 +76,12 @@ class ChatScreenState extends State<ChatScreen>{
     return Scaffold(
       // drawer: Drawer(),
       // appBar: AppBar(
-          // actions: [
-          //   const Padding(
-          //     padding: EdgeInsets.symmetric(horizontal: 15),
-          //     child: Icon(Icons.notifications),
-          //   ),
-          // ]
+      // actions: [
+      //   const Padding(
+      //     padding: EdgeInsets.symmetric(horizontal: 15),
+      //     child: Icon(Icons.notifications),
+      //   ),
+      // ]
       // ),
       body: ListView(
         children: [
@@ -110,7 +137,7 @@ class ChatScreenState extends State<ChatScreen>{
             ),
           ),
           // ActiveChats(),
-          if(listDoctor.isNotEmpty) RecentChats(listDoctor),
+          if (listDoctor.isNotEmpty) RecentChats(listDoctor, listUser, username.toString(), isUserDoctor == true),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -123,4 +150,3 @@ class ChatScreenState extends State<ChatScreen>{
     );
   }
 }
-

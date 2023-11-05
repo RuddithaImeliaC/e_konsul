@@ -5,23 +5,32 @@ import 'package:e_konsul/chatscreen.dart';
 import 'package:e_konsul/components/my_button.dart';
 import 'package:e_konsul/components/my_textfield.dart';
 import 'package:e_konsul/models/doctor.dart';
+import 'package:e_konsul/models/recent_chat.dart';
 import 'package:e_konsul/otpscreen.dart';
 import 'package:e_konsul/registerscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 import 'models/user.dart';
 
-String? prefUser;
+bool? prefUser;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await InitFirebase();
   prefUser = await isLoggedIn();
-  runApp(const MyApp());
+  runApp(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => RecentChatData()),
+        ],
+        child: const MyApp(),
+      )
+  );
 }
 
 InitFirebase() async {
@@ -34,8 +43,8 @@ InitFirebase() async {
 
 isLoggedIn() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  var users = await prefs.getString('users');
-  return users;
+  var isLoggedIn = await prefs.getBool('isLoggedIn');
+  return isLoggedIn;
 }
 
 class MyApp extends StatelessWidget {
@@ -51,15 +60,15 @@ class MyApp extends StatelessWidget {
         '/chatscreen': (BuildContext context) => ChatScreen(),
         '/registerscreen': (BuildContext context) => RegisterScreen(),
         '/loginscreen': (BuildContext context) => LoginScreen(),
-        // '/chatPage': (BuildContext context) => ChatPage()
+        '/chatPage': (BuildContext context) => ChatPage()
       },
-      onGenerateRoute: (RouteSettings settings) {
-        var routes = <String, WidgetBuilder>{
-          "/chatPage": (ctx) => ChatPage(doctor: settings.arguments as Doctor),
-        };
-        WidgetBuilder? builder = routes[settings.name];
-        return MaterialPageRoute(builder: (ctx) => builder!(ctx));
-      },
+      // onGenerateRoute: (RouteSettings settings) {
+      //   var routes = <String, WidgetBuilder>{
+      //     "/chatPage": (ctx) => ChatPage(doctor: settings.arguments as Doctor),
+      //   };
+      //   WidgetBuilder? builder = routes[settings.name];
+      //   return MaterialPageRoute(builder: (ctx) => builder!(ctx));
+      // },
       home: (prefUser != null) ? ChatScreen() : LoginScreen(),
     );
   }
@@ -76,6 +85,8 @@ class _LoginScreen extends State<LoginScreen> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   String? usernameErrorText, passwordErrorText;
+  late DatabaseReference users;
+  late SharedPreferences prefs;
 
   signUserIn(context) async {
     String username = usernameController.text;
@@ -104,12 +115,11 @@ class _LoginScreen extends State<LoginScreen> {
       var rng = new Random();
       var otpcode = rng.nextInt(9000) + 1000;
       print(otpcode);
-      DatabaseReference users =
-          FirebaseDatabase.instance.ref('users/$username');
+      // users = FirebaseDatabase.instance.ref('users/$username');
       await users.update({
         "otpcode": otpcode,
       });
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      // final SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('users', username);
       setState(() {
         usernameErrorText = '';
@@ -120,14 +130,36 @@ class _LoginScreen extends State<LoginScreen> {
   }
 
   Future<bool> login(String username, String password) async {
-    DatabaseReference users = FirebaseDatabase.instance.ref('users/$username');
+    users = FirebaseDatabase.instance.ref('users/$username');
     DataSnapshot snap = await users.get();
     print(snap.value);
     if (snap.value != null) {
       User user = User.fromSnapshot(snap.value as Map<dynamic, dynamic>);
-      if (user.password == password) return true;
+      if (user.password == password) {
+        setUserSession(username, false);
+        return true;
+      }
     }
+
+    print("find doctors");
+    // if user not found cek doctor user
+    users = FirebaseDatabase.instance.ref('doctors/$username');
+    snap = await users.get();
+    if (snap.value != null) {
+      User user = User.fromSnapshot(snap.value as Map<dynamic, dynamic>);
+      if (user.password == password) {
+        setUserSession(username, true);
+        return true;
+      }
+    }
+
     return false;
+  }
+
+  setUserSession(String username, bool isUserDoctor) async {
+    prefs = await SharedPreferences.getInstance();
+    prefs.setString('users', username);
+    prefs.setBool('isUserDoctor', isUserDoctor);
   }
 
   @override
