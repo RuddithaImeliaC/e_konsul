@@ -23,44 +23,49 @@ class ChatPageState extends State<ChatPage> {
   late User user;
   List<Message> listMessage = [];
   late DatabaseReference m;
-  late StreamSubscription listenDb;
+  late StreamSubscription? listenDb;
   late SharedPreferences prefs;
+  late bool? isUserDoctor;
+  String headerName = '';
 
-  getMessages(String user, String key) async {
+  getMessages(String userKey, String doctorKey) async {
     prefs = await SharedPreferences.getInstance();
-    var isUserDoctor = prefs.getBool('isUserDoctor');
-    // if(isUserDoctor == true){
+    isUserDoctor = prefs.getBool('isUserDoctor');
+    if(isUserDoctor == true){
+      headerName = user.nama_lengkap;
+    } else {
+      headerName = "Dr. ${doctor.name}";
+    }
+    DatabaseReference c = FirebaseDatabase.instance.ref('chats');
+    DataSnapshot snapChats = await c.get();
 
-    // }
-    // var user = await prefs.getString('users');
-    // var key = doctor.doctorKey;
-    m = FirebaseDatabase.instance.ref('chats/${user}_${key}');
+    var chatKey = "${userKey}_$doctorKey";
+    m = FirebaseDatabase.instance.ref('chats/$chatKey');
     DataSnapshot snap = await m.get();
 
+    if (snap.value == null) {
+      // List list = [];
+      var value = snapChats.value as Map<dynamic,dynamic>;
+      value[chatKey] = '';
+      c.set(value);
+    }
+
     // listener
-    listenDb = m.onValue.listen((event) {
-      setState(() {
-        listMessage.clear();
-        var list = event.snapshot.value as List<Object?>;
-        list.forEach((valueMessage) {
-          var data = valueMessage as Map<dynamic, dynamic>;
-          var message = Message.fromSnapshot(data);
-          listMessage.add(message);
+      listenDb = m.onValue.listen((event) {
+        if (!mounted) return;
+        setState(() {
+          listMessage.clear();
+          if (event.snapshot.value != '') {
+            var list = event.snapshot.value as List<Object?>;
+            list.forEach((valueMessage) {
+              var data = valueMessage as Map<dynamic, dynamic>;
+              var message = Message.fromSnapshot(data);
+              listMessage.add(message);
+            });
+          }
         });
       });
-    });
 
-    // if (snap.value != null) {
-    //   setState(() {
-    //     listMessage.clear();
-    //     var list = snap.value as List<Object?>;
-    //     list.forEach((valueMessage) {
-    //       var data = valueMessage as Map<dynamic, dynamic>;
-    //       var message = Message.fromSnapshot(data);
-    //       listMessage.add(message);
-    //     });
-    //   });
-    // }
   }
 
   @override
@@ -71,14 +76,14 @@ class ChatPageState extends State<ChatPage> {
   @override
   void dispose() {
     super.dispose();
-    listenDb.cancel();
+    listenDb?.cancel();
   }
 
   @override
   Widget build(BuildContext context) {
     doctor = context.watch<RecentChatData>().doctor;
     user = context.watch<RecentChatData>().user;
-    getMessages(user.username,doctor.doctorKey);
+    getMessages(user.username, doctor.doctorKey);
     return Scaffold(
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(70.0),
@@ -99,7 +104,7 @@ class ChatPageState extends State<ChatPage> {
                   Padding(
                     padding: EdgeInsets.only(left: 5),
                     child: Text(
-                      "Dr. ${doctor.name}",
+                      headerName,
                       style: TextStyle(color: Color(0xFF113953)),
                     ),
                   )

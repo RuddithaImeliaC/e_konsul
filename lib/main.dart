@@ -4,7 +4,6 @@ import 'package:e_konsul/chatpage.dart';
 import 'package:e_konsul/chatscreen.dart';
 import 'package:e_konsul/components/my_button.dart';
 import 'package:e_konsul/components/my_textfield.dart';
-import 'package:e_konsul/models/doctor.dart';
 import 'package:e_konsul/models/recent_chat.dart';
 import 'package:e_konsul/otpscreen.dart';
 import 'package:e_konsul/registerscreen.dart';
@@ -88,7 +87,7 @@ class _LoginScreen extends State<LoginScreen> {
   late DatabaseReference users;
   late SharedPreferences prefs;
 
-  signUserIn(context) async {
+  signUserIn(BuildContext context) async {
     String username = usernameController.text;
     String password = passwordController.text;
     usernameErrorText = '';
@@ -104,7 +103,7 @@ class _LoginScreen extends State<LoginScreen> {
       });
       return;
     }
-    var success = await login(username, password);
+    var success = await login(context, username, password);
     print(success);
     if (!success) {
       setState(() {
@@ -129,14 +128,14 @@ class _LoginScreen extends State<LoginScreen> {
     }
   }
 
-  Future<bool> login(String username, String password) async {
+  Future<bool> login(BuildContext context, String username, String password) async {
     users = FirebaseDatabase.instance.ref('users/$username');
     DataSnapshot snap = await users.get();
     print(snap.value);
     if (snap.value != null) {
       User user = User.fromSnapshot(snap.value as Map<dynamic, dynamic>);
       if (user.password == password) {
-        setUserSession(username, false);
+        setUserSession(context, username, false);
         return true;
       }
     }
@@ -148,7 +147,7 @@ class _LoginScreen extends State<LoginScreen> {
     if (snap.value != null) {
       User user = User.fromSnapshot(snap.value as Map<dynamic, dynamic>);
       if (user.password == password) {
-        setUserSession(username, true);
+        setUserSession(context, username, true);
         return true;
       }
     }
@@ -156,10 +155,11 @@ class _LoginScreen extends State<LoginScreen> {
     return false;
   }
 
-  setUserSession(String username, bool isUserDoctor) async {
+  setUserSession(BuildContext context, String username, bool isUserDoctor) async {
     prefs = await SharedPreferences.getInstance();
     prefs.setString('users', username);
     prefs.setBool('isUserDoctor', isUserDoctor);
+    context.read<RecentChatData>().setIsUserDoctor(isUserDoctor);
   }
 
   @override

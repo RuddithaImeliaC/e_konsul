@@ -1,8 +1,10 @@
 import 'package:e_konsul/models/doctor.dart';
+import 'package:e_konsul/models/recent_chat.dart';
 import 'package:e_konsul/models/user.dart';
 import 'package:e_konsul/recentchats.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -20,19 +22,27 @@ class ChatScreenState extends State<ChatScreen> {
   late bool? isUserDoctor;
   TextEditingController SearchController = new TextEditingController();
 
-  getdoctors(String search) async {
+  getChats(BuildContext context, String search) async {
     prefs = await SharedPreferences.getInstance();
     username = prefs.getString('users');
     users = FirebaseDatabase.instance.ref('users');
     isUserDoctor = prefs.getBool('isUserDoctor');
+    context.read<RecentChatData>().setIsUserDoctor(isUserDoctor == true);
     DataSnapshot snap = await users.get();
     if (snap.value != null) {
       var databaseUser = snap.value as Map<dynamic, dynamic>;
+      if (!mounted) return;
       setState(() {
         listUser.clear();
         databaseUser.forEach((key, value) {
           var user = User.fromSnapshot(value);
-          if (user.username.contains(search)) {
+
+          // kondisi utk search
+          if (isUserDoctor == true) {
+            if (user.nama_lengkap.toLowerCase().contains(search)) {
+              listUser.add(user);
+            }
+          } else {
             listUser.add(user);
           }
         });
@@ -42,15 +52,21 @@ class ChatScreenState extends State<ChatScreen> {
     doctors = FirebaseDatabase.instance.ref('doctors');
     snap = await doctors.get();
     if (snap.value != null) {
-      Map<dynamic, dynamic> databaseDoctors =
-          snap.value as Map<dynamic, dynamic>;
+      Map<dynamic, dynamic> databaseDoctors = snap.value as Map<dynamic, dynamic>;
+      if (!mounted) return;
       setState(() {
         listDoctor.clear();
         databaseDoctors.forEach((key, value) {
           var data = value as Map<dynamic, dynamic>;
           data["doctorKey"] = key;
           var doctor = Doctor.fromSnapshot(data);
-          if (doctor.name.contains(search)) {
+
+          // kondisi utk search
+          if (isUserDoctor == false) {
+            if (doctor.name.toLowerCase().contains(search)) {
+              listDoctor.add(doctor);
+            }
+          } else {
             listDoctor.add(doctor);
           }
         });
@@ -67,22 +83,13 @@ class ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    getdoctors("");
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    getChats(context, "");
     return Scaffold(
-      // drawer: Drawer(),
-      // appBar: AppBar(
-      // actions: [
-      //   const Padding(
-      //     padding: EdgeInsets.symmetric(horizontal: 15),
-      //     child: Icon(Icons.notifications),
-      //   ),
-      // ]
-      // ),
       body: ListView(
         children: [
           Padding(
@@ -123,7 +130,7 @@ class ChatScreenState extends State<ChatScreen> {
                             hintText: "Search", border: InputBorder.none),
                         controller: SearchController,
                         onEditingComplete: () {
-                          getdoctors(SearchController.text);
+                          getChats(context, SearchController.text);
                         },
                       ),
                     ),

@@ -19,18 +19,23 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
   addMessages(BuildContext context) async {
     var msg = context.read<RecentChatData>().typeMessage;
     context.read<RecentChatData>().setTypeMessage('');
+
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    var user = await prefs.getString('users');
-    var key = widget.doctorKey;
-    DatabaseReference m = FirebaseDatabase.instance.ref('chats/${user}_${key}');
+    var isUserDoctor = prefs.getBool('isUserDoctor');
+
+    var doctor = context.read<RecentChatData>().doctor;
+    var user = context.read<RecentChatData>().user;
+
+    var chatKey = "${user.username}_${doctor.doctorKey}";
+    DatabaseReference m = FirebaseDatabase.instance.ref('chats/$chatKey');
     DataSnapshot snap = await m.get();
 
-    var objectMsg = {'isDoctor': false, 'value': msg, 'createdAt': DateTime.now().toString()};
+    var objectMsg = {'isDoctor': isUserDoctor, 'value': msg, 'createdAt': DateTime.now().toString()};
     if (snap.value == null || snap.value == '') {
       DatabaseReference c = FirebaseDatabase.instance.ref('chats');
       DataSnapshot snapChat = await c.get();
       var dataChat = snapChat.value as Map<dynamic,dynamic>;
-      dataChat['${user}_${key}']= [
+      dataChat[chatKey]= [
         objectMsg
       ];
       c.set(dataChat);
