@@ -83,12 +83,12 @@ class ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     // TODO: implement initState
+    getChats(super.context, "");
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    getChats(context, "");
     return Scaffold(
       body: ListView(
         children: [
@@ -129,6 +129,9 @@ class ChatScreenState extends State<ChatScreen> {
                         decoration: InputDecoration(
                             hintText: "Search", border: InputBorder.none),
                         controller: SearchController,
+                        onChanged: (value) {
+                          getChats(context, SearchController.text);
+                        },
                         onEditingComplete: () {
                           getChats(context, SearchController.text);
                         },
