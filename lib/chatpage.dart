@@ -79,6 +79,7 @@ class ChatPageState extends State<ChatPage> {
     listenDb?.cancel();
   }
 
+
   @override
   Widget build(BuildContext context) {
     doctor = context.watch<RecentChatData>().doctor;

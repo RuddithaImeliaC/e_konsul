@@ -10,6 +10,7 @@ class Message {
   late final bool isDoctor;
   late final String value;
   String? createdAt;
+  String? file;
 
   Message.fromSnapshot(Map<dynamic, dynamic> json) {
     isDoctor = json['isDoctor'];
@@ -19,6 +20,11 @@ class Message {
     } else {
       createdAt = "";
     }
+    if(json['file'] != null) {
+      file = json['file'].toString();
+    } else {
+      file = "";
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -26,6 +32,7 @@ class Message {
     data['isDoctor'] = isDoctor;
     data['value'] = value;
     data['createdAt'] = createdAt;
+    data['file'] = file;
     return data;
   }
 }

@@ -3,10 +3,18 @@ import 'package:e_konsul/models/message.dart';
 import 'package:e_konsul/models/recent_chat.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ChatSample extends StatelessWidget {
   final List<Message> listMessage;
   ChatSample(this.listMessage);
+
+  Future<void> _launchUrl(String url) async {
+    var view = Uri.parse(url);
+    if (!await launchUrl(view)) {
+      throw Exception('Could not launch $view');
+    }
+  }
 
   List<Widget> widgetListMessage(BuildContext context) {
     List<Widget> l = [];
@@ -33,6 +41,40 @@ class ChatSample extends StatelessWidget {
   }
 
   widgetMessage(List<Widget> l, Message message, bool onLeft){
+    var colorValue = Colors.black;
+    var colorDate = Colors.black45;
+    if(onLeft == false) {
+      colorValue = Colors.white;
+      colorDate = Colors.white54;
+    }
+
+    var rowData = <Widget>[
+      Container(
+          margin: EdgeInsetsDirectional.only(bottom: 4),
+          child: Text(
+            message.value,
+            style: TextStyle(fontSize: 17, color: colorValue),
+          )
+      ),
+    ];
+
+    if (message.file != '') {
+      String img = message.file.toString();
+      rowData.add(GestureDetector(
+          onTap: () {_launchUrl(img);},
+          child: Container(
+            margin: EdgeInsetsDirectional.only(bottom: 4),
+            child: Image.network(img, height: 320),
+          )
+      ));
+    }
+
+    rowData.add(Text(
+        "${message.createdAt}",
+        style: TextStyle(fontSize: 12, color: colorDate),
+      )
+    );
+
     if(onLeft == true) {
       l.add(Padding(
         padding: EdgeInsets.only(right: 80),
@@ -45,19 +87,7 @@ class ChatSample extends StatelessWidget {
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                      margin: EdgeInsetsDirectional.only(bottom: 4),
-                      child: Text(
-                        "${message.value}",
-                        style: TextStyle(fontSize: 17),
-                      )
-                  ),
-                  Text(
-                    "${message.createdAt}",
-                    style: TextStyle(fontSize: 12, color: Colors.black45),
-                  ),
-                ],
+                children: rowData
               )
           ),
         ),
@@ -77,19 +107,8 @@ class ChatSample extends StatelessWidget {
                 ),
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Container(
-                          margin: EdgeInsetsDirectional.only(bottom: 4),
-                          child: Text(
-                            "${message.value}",
-                            style: TextStyle(fontSize: 17, color: Colors.white),
-                          )
-                      ),
-                      Text(
-                        "${message.createdAt}",
-                        style: TextStyle(fontSize: 12, color: Colors.white54),
-                      ),
-                    ])
+                    children: rowData
+                )
             ),
           ),
         ),
